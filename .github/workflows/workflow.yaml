@@ -1,13 +1,14 @@
-name: Terraform Apply
+name: Terraform Apply on Azure
 
 on:
   push:
     branches:
-      - main
+      - main # Runs when code is pushed to main
 
 jobs:
   terraform:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
@@ -15,14 +16,15 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
         with:
-          terraform_version: 1.5.0 # Use the latest stable version
+          terraform_version: 1.5.0 # Use the latest Terraform version
 
-      - name: Azure Login
+      - name: Configure Azure Authentication
         run: |
-          az login --service-principal \
-            -u ${{ secrets.ARM_CLIENT_ID }} \
-            -p ${{ secrets.ARM_CLIENT_SECRET }} \
-            --tenant ${{ secrets.ARM_TENANT_ID }}
+          echo "Setting up Azure credentials..."
+          export ARM_CLIENT_ID=${{ secrets.ARM_CLIENT_ID }}
+          export ARM_CLIENT_SECRET=${{ secrets.ARM_CLIENT_SECRET }}
+          export ARM_TENANT_ID=${{ secrets.ARM_TENANT_ID }}
+          export ARM_SUBSCRIPTION_ID=${{ secrets.ARM_SUBSCRIPTION_ID }}
 
       - name: Terraform Init
         run: terraform init
